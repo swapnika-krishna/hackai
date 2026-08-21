@@ -1,6 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
+import { initializeApp, getApps, getApp } from 'firebase/app';
+import {
+  getFirestore,
+  collection,
+  doc,
+  getDocs,
+  setDoc,
+  Firestore,
+} from 'firebase/firestore';
 import { User, Complaint, ComplaintHistoryItem, StudentStats, AdminStats } from '../src/types';
 
 interface DBData {
@@ -27,11 +36,15 @@ class Database {
     },
   };
 
+  private firestoreDb: Firestore | null = null;
+  private isFirestoreReady: boolean = false;
+
   constructor() {
     this.init();
   }
 
-  private init() {
+  private async init() {
+    // 1. Load local cache first for instant startup
     try {
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -42,12 +55,82 @@ class Database {
         this.data = JSON.parse(raw);
       } else {
         this.seedInitialData();
-        this.save();
+        this.saveLocal();
       }
     } catch (err) {
-      console.error('Error initializing database:', err);
+      console.error('Error reading local cache:', err);
       this.seedInitialData();
-      this.save();
+      this.saveLocal();
+    }
+
+    // 2. Initialize Firebase Firestore Cloud Database
+    try {
+      const configPath = path.join(process.cwd(), 'firebase-applet-config.json');
+      if (fs.existsSync(configPath)) {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        const app = getApps().length === 0 ? initializeApp(config) : getApp();
+        this.firestoreDb = getFirestore(app, config.firestoreDatabaseId);
+        this.isFirestoreReady = true;
+        console.log(`[Firestore] Connected to Cloud Database: ${config.firestoreDatabaseId}`);
+
+        // Sync from Cloud Firestore
+        await this.syncFromFirestore();
+      }
+    } catch (err) {
+      console.warn('[Firestore] Initialization fallback to local store:', err);
+    }
+  }
+
+  private async syncFromFirestore() {
+    if (!this.firestoreDb) return;
+
+    try {
+      // Sync users from Firestore
+      const usersCol = collection(this.firestoreDb, 'users');
+      const usersSnapshot = await getDocs(usersCol);
+      if (!usersSnapshot.empty) {
+        const remoteUsers: (User & { passwordHash: string })[] = [];
+        usersSnapshot.forEach((docSnap) => {
+          remoteUsers.push(docSnap.data() as User & { passwordHash: string });
+        });
+        if (remoteUsers.length > 0) {
+          this.data.users = remoteUsers;
+        }
+      } else {
+        // Seed default admin in Firestore
+        for (const user of this.data.users) {
+          await setDoc(doc(this.firestoreDb, 'users', user.id), user);
+        }
+      }
+
+      // Sync complaints from Firestore
+      const complaintsCol = collection(this.firestoreDb, 'complaints');
+      const complaintsSnapshot = await getDocs(complaintsCol);
+      if (!complaintsSnapshot.empty) {
+        const remoteComplaints: Complaint[] = [];
+        complaintsSnapshot.forEach((docSnap) => {
+          remoteComplaints.push(docSnap.data() as Complaint);
+        });
+        if (remoteComplaints.length > 0) {
+          // Sort by creation desc
+          remoteComplaints.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+          this.data.complaints = remoteComplaints;
+        }
+      }
+
+      // Sync counters from Firestore
+      const countersCol = collection(this.firestoreDb, 'system');
+      const countersSnapshot = await getDocs(countersCol);
+      countersSnapshot.forEach((docSnap) => {
+        if (docSnap.id === 'counters') {
+          this.data.counters = docSnap.data() as { complaintSeq: number; year: number };
+        }
+      });
+
+      this.saveLocal();
+      console.log(`[Firestore] Cloud database synchronization complete (${this.data.complaints.length} complaints, ${this.data.users.length} users).`);
+    } catch (err) {
+      console.warn('[Firestore] Sync warning (using active cache):', err);
     }
   }
 
@@ -82,7 +165,7 @@ class Database {
     };
   }
 
-  private save() {
+  private saveLocal() {
     try {
       if (!fs.existsSync(DATA_DIR)) {
         fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -90,6 +173,26 @@ class Database {
       fs.writeFileSync(DB_FILE, JSON.stringify(this.data, null, 2), 'utf-8');
     } catch (err) {
       console.error('Error saving database:', err);
+    }
+  }
+
+  private async persistUserToCloud(user: User & { passwordHash: string }) {
+    if (!this.firestoreDb) return;
+    try {
+      await setDoc(doc(this.firestoreDb, 'users', user.id), user);
+    } catch (e) {
+      console.error('[Firestore] Error persisting user:', e);
+    }
+  }
+
+  private async persistComplaintToCloud(complaint: Complaint) {
+    if (!this.firestoreDb) return;
+    try {
+      await setDoc(doc(this.firestoreDb, 'complaints', complaint.id), complaint);
+      // Persist sequence counters
+      await setDoc(doc(this.firestoreDb, 'system', 'counters'), this.data.counters);
+    } catch (e) {
+      console.error('[Firestore] Error persisting complaint:', e);
     }
   }
 
@@ -133,7 +236,8 @@ class Database {
     };
 
     this.data.users.push(newUser);
-    this.save();
+    this.saveLocal();
+    this.persistUserToCloud(newUser);
 
     const { passwordHash: _, ...userWithoutPassword } = newUser;
     return userWithoutPassword;
@@ -157,7 +261,9 @@ class Database {
       };
     }
 
-    this.save();
+    this.saveLocal();
+    this.persistUserToCloud(user);
+
     const { passwordHash: _, ...cleanUser } = user;
     return cleanUser;
   }
@@ -171,7 +277,8 @@ class Database {
 
     const salt = bcrypt.genSaltSync(10);
     user.passwordHash = bcrypt.hashSync(newPass, salt);
-    this.save();
+    this.saveLocal();
+    this.persistUserToCloud(user);
     return true;
   }
 
@@ -185,7 +292,7 @@ class Database {
     this.data.counters.complaintSeq += 1;
     const seq = this.data.counters.complaintSeq;
     const seqFormatted = String(seq).padStart(6, '0');
-    this.save();
+    this.saveLocal();
     return `CIV-${currentYear}-${seqFormatted}`;
   }
 
@@ -254,7 +361,9 @@ class Database {
     this.data.complaints.unshift(newComplaint);
     this.data.complaintHistory.push(initialHistoryItem, aiHistoryItem);
 
-    this.save();
+    this.saveLocal();
+    this.persistComplaintToCloud(newComplaint);
+
     return newComplaint;
   }
 
@@ -331,7 +440,9 @@ class Database {
     complaint.history.push(historyItem);
     this.data.complaintHistory.push(historyItem);
 
-    this.save();
+    this.saveLocal();
+    this.persistComplaintToCloud(complaint);
+
     return complaint;
   }
 
@@ -361,12 +472,11 @@ class Database {
     const inProgress = all.filter((c) => c.status === 'Assigned' || c.status === 'In Progress').length;
     const highCritical = all.filter((c) => c.severity === 'High' || c.severity === 'Critical').length;
 
-    // Overdue logic: if not resolved and submission > 48h or estimated time exceeded
+    // Overdue logic: if not resolved and submission > 24h
     const nowMs = Date.now();
     const overdue = all.filter((c) => {
       if (c.status === 'Resolved') return false;
       const createdMs = new Date(c.createdAt).getTime();
-      // Assume 24 hours standard SLA if action/resolution exceeded
       const hoursAgo = (nowMs - createdMs) / (1000 * 60 * 60);
       return hoursAgo > 24;
     }).length;

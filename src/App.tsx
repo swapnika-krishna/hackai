@@ -105,14 +105,16 @@ const MainApp: React.FC = () => {
       <footer className="border-t border-zinc-900 bg-zinc-950/80 py-6 text-center text-xs text-zinc-500">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
             <span className="font-semibold text-zinc-400">CivicResolve Campus Node</span>
+            <span className="text-zinc-600">|</span>
+            <span className="text-emerald-400 font-mono text-[11px]">Cloud Firestore Persistent DB</span>
             <span className="text-zinc-600">|</span>
             <span>Gemini AI Triage Engine v2.4</span>
           </div>
 
           <div>
-            Built with persistent database records & real SLA verification
+            Built with persistent Cloud Firestore records & real SLA verification
           </div>
         </div>
       </footer>

@@ -1,0 +1,51 @@
+{
+  "entities": {
+    "User": {
+      "collection": "users",
+      "fields": {
+        "id": { "type": "string", "description": "User ID" },
+        "name": { "type": "string", "description": "User full name" },
+        "studentId": { "type": "string", "description": "Student roll or registration number" },
+        "email": { "type": "string", "description": "User email address" },
+        "phone": { "type": "string", "description": "User phone contact" },
+        "department": { "type": "string", "description": "Department name" },
+        "year": { "type": "string", "description": "College year" },
+        "role": { "type": "string", "description": "Role: student or admin" },
+        "passwordHash": { "type": "string", "description": "Hashed password" },
+        "createdAt": { "type": "string", "description": "Timestamp ISO" }
+      }
+    },
+    "Complaint": {
+      "collection": "complaints",
+      "fields": {
+        "id": { "type": "string", "description": "Firestore document ID" },
+        "complaintId": { "type": "string", "description": "Human readable ticket ID CIV-YYYY-XXXXXX" },
+        "userId": { "type": "string", "description": "Creator User ID" },
+        "studentName": { "type": "string", "description": "Student Name" },
+        "studentIdNumber": { "type": "string", "description": "Student ID" },
+        "studentEmail": { "type": "string", "description": "Student Email" },
+        "studentPhone": { "type": "string", "description": "Student Phone" },
+        "studentDepartment": { "type": "string", "description": "Student Dept" },
+        "studentYear": { "type": "string", "description": "Student Year" },
+        "title": { "type": "string", "description": "Complaint title" },
+        "description": { "type": "string", "description": "Issue details" },
+        "category": { "type": "string", "description": "Category e.g. Hostel & Living" },
+        "location": { "type": "object", "description": "Block, Floor, Specific Location" },
+        "imageUrl": { "type": "string", "description": "Attached image URL or data" },
+        "severity": { "type": "string", "description": "Severity level" },
+        "priority": { "type": "string", "description": "Priority tier" },
+        "department": { "type": "string", "description": "Assigned Department" },
+        "estimatedActionTime": { "type": "string", "description": "Initial response SLA" },
+        "estimatedResolutionTime": { "type": "string", "description": "Complete resolution SLA" },
+        "aiSummary": { "type": "string", "description": "AI Generated triage summary" },
+        "status": { "type": "string", "description": "Submitted | Under Review | Assigned | In Progress | Resolved" },
+        "assignedTo": { "type": "string", "description": "Assignee staff/officer" },
+        "adminRemarks": { "type": "string", "description": "Latest remark" },
+        "createdAt": { "type": "string", "description": "Creation timestamp" },
+        "updatedAt": { "type": "string", "description": "Updated timestamp" },
+        "resolvedAt": { "type": "string", "description": "Resolution timestamp" },
+        "history": { "type": "array", "description": "Audit history trail" }
+      }
+    }
+  }
+}
