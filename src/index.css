@@ -1,1 +1,28 @@
 @import "tailwindcss";
+
+@layer base {
+  body {
+    @apply antialiased transition-colors duration-300;
+  }
+}
+
+/* Theme color modifications */
+html.theme-midnight {
+  --theme-bg-base: #020617;
+  --theme-accent: #06b6d4;
+}
+
+html.theme-emerald {
+  --theme-bg-base: #04140f;
+  --theme-accent: #10b981;
+}
+
+html.theme-dark {
+  --theme-bg-base: #09090b;
+  --theme-accent: #10b981;
+}
+
+html.theme-light {
+  --theme-bg-base: #f8fafc;
+  --theme-accent: #059669;
+}

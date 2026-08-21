@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { CampusBackground } from './components/CampusBackground';
 import { Navbar } from './components/Navbar';
 import { HackathonDemoBar } from './components/HackathonDemoBar';
 import { LaunchPage } from './pages/LaunchPage';
@@ -14,6 +16,7 @@ import { AdminDashboard } from './pages/AdminDashboard';
 
 const MainApp: React.FC = () => {
   const { user, isAuthenticated, isLoading } = useAuth();
+  const { settings } = useTheme();
   const [currentView, setCurrentView] = useState<string>('launch');
   const [selectedComplaintId, setSelectedComplaintId] = useState<string | null>(null);
 
@@ -101,17 +104,31 @@ const MainApp: React.FC = () => {
     }
   };
 
+  const getContainerBgClass = () => {
+    if (!settings.isBgEnabled) {
+      if (settings.theme === 'light') return 'bg-zinc-100 text-zinc-900';
+      if (settings.theme === 'midnight') return 'bg-slate-950 text-slate-100';
+      if (settings.theme === 'emerald') return 'bg-[#04140f] text-emerald-100';
+      return 'bg-zinc-950 text-zinc-100';
+    }
+    // When campus background is enabled, allow the blurred image to show through with slight transparency
+    if (settings.theme === 'light') return 'bg-zinc-100/70 text-zinc-900';
+    return 'bg-zinc-950/70 text-zinc-100';
+  };
+
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col selection:bg-emerald-500/30 selection:text-emerald-200">
+    <div className={`min-h-screen relative flex flex-col selection:bg-emerald-500/30 selection:text-emerald-200 transition-colors duration-300 ${getContainerBgClass()}`}>
       
+      {/* Blurred Campus Background Layer */}
+      <CampusBackground />
+
       {/* Top Hackathon Demo Flow Quick Switcher */}
       <HackathonDemoBar
         currentView={currentView}
         setCurrentView={setCurrentView}
-        selectedComplaintId={selectedComplaintId}
       />
 
-      {/* Navigation Bar */}
+      {/* Navigation Bar with Theme & Background Switcher */}
       <Navbar
         currentView={currentView}
         setCurrentView={setCurrentView}
@@ -119,24 +136,24 @@ const MainApp: React.FC = () => {
       />
 
       {/* Main Page Content */}
-      <main className="flex-1">
+      <main className="flex-1 relative z-10">
         {renderView()}
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-zinc-900 bg-zinc-950/80 py-6 text-center text-xs text-zinc-500">
+      <footer className="relative z-10 border-t border-zinc-900/80 bg-zinc-950/80 backdrop-blur-md py-6 text-center text-xs text-zinc-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="font-semibold text-zinc-400">CivicMind Campus Node</span>
+            <span className="font-semibold text-zinc-300">CivicMind Campus Node</span>
             <span className="text-zinc-600">|</span>
             <span className="text-emerald-400 font-mono text-[11px]">Cloud Firestore Persistent DB</span>
             <span className="text-zinc-600">|</span>
             <span>Gemini AI Triage Engine v2.4</span>
           </div>
 
-          <div>
-            Built with persistent Cloud Firestore records & real SLA verification
+          <div className="flex items-center gap-2 text-zinc-400">
+            <span>Built with real-time campus tracking & intelligent SLA resolution</span>
           </div>
         </div>
       </footer>
@@ -147,8 +164,10 @@ const MainApp: React.FC = () => {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <MainApp />
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <MainApp />
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
