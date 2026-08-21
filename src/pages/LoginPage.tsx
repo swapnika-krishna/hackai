@@ -16,14 +16,20 @@ import { UserRole } from '../types';
 
 interface LoginPageProps {
   setCurrentView: (view: string) => void;
+  defaultRole?: UserRole;
+  accessDeniedMessage?: string;
 }
 
-export const LoginPage: React.FC<LoginPageProps> = ({ setCurrentView }) => {
+export const LoginPage: React.FC<LoginPageProps> = ({ 
+  setCurrentView, 
+  defaultRole = 'student',
+  accessDeniedMessage 
+}) => {
   const { login } = useAuth();
-  const [selectedRole, setSelectedRole] = useState<UserRole>('student');
+  const [selectedRole, setSelectedRole] = useState<UserRole>(defaultRole);
   const [emailOrId, setEmailOrId] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(accessDeniedMessage || null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -89,7 +95,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ setCurrentView }) => {
               Campus Portal Login
             </h2>
             <p className="text-xs text-zinc-400 mt-1">
-              Select your role to access the CivicResolve resolution platform
+              Select your role to access the CivicMind resolution platform
             </p>
           </div>
 

@@ -23,7 +23,26 @@ interface DBData {
 }
 
 const DATA_DIR = path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DATA_DIR, 'civicresolve_db.json');
+const DB_FILE = path.join(DATA_DIR, 'civicmind_db.json');
+
+function cleanForFirestore<T>(obj: T): any {
+  if (obj === null || obj === undefined) {
+    return null;
+  }
+  if (Array.isArray(obj)) {
+    return obj.map((item) => cleanForFirestore(item));
+  }
+  if (typeof obj === 'object') {
+    const cleaned: Record<string, any> = {};
+    for (const [key, value] of Object.entries(obj as Record<string, any>)) {
+      if (value !== undefined) {
+        cleaned[key] = cleanForFirestore(value);
+      }
+    }
+    return cleaned;
+  }
+  return obj;
+}
 
 class Database {
   private data: DBData = {
@@ -99,7 +118,7 @@ class Database {
       } else {
         // Seed default admin in Firestore
         for (const user of this.data.users) {
-          await setDoc(doc(this.firestoreDb, 'users', user.id), user);
+          await setDoc(doc(this.firestoreDb, 'users', user.id), cleanForFirestore(user));
         }
       }
 
@@ -179,7 +198,7 @@ class Database {
   private async persistUserToCloud(user: User & { passwordHash: string }) {
     if (!this.firestoreDb) return;
     try {
-      await setDoc(doc(this.firestoreDb, 'users', user.id), user);
+      await setDoc(doc(this.firestoreDb, 'users', user.id), cleanForFirestore(user));
     } catch (e) {
       console.error('[Firestore] Error persisting user:', e);
     }
@@ -188,9 +207,9 @@ class Database {
   private async persistComplaintToCloud(complaint: Complaint) {
     if (!this.firestoreDb) return;
     try {
-      await setDoc(doc(this.firestoreDb, 'complaints', complaint.id), complaint);
+      await setDoc(doc(this.firestoreDb, 'complaints', complaint.id), cleanForFirestore(complaint));
       // Persist sequence counters
-      await setDoc(doc(this.firestoreDb, 'system', 'counters'), this.data.counters);
+      await setDoc(doc(this.firestoreDb, 'system', 'counters'), cleanForFirestore(this.data.counters));
     } catch (e) {
       console.error('[Firestore] Error persisting complaint:', e);
     }
@@ -351,7 +370,7 @@ class Database {
       complaintId: newComplaint.complaintId,
       newStatus: 'Submitted',
       action: 'AI Triage & Analysis Completed',
-      changedBy: 'CivicResolve AI Engine',
+      changedBy: 'CivicMind AI Engine',
       changedByRole: 'system',
       remark: `Assigned Category: ${newComplaint.category} | Severity: ${newComplaint.severity} | Priority: ${newComplaint.priority} | Department: ${newComplaint.department}`,
       timestamp: now,

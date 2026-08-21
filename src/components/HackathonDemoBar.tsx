@@ -14,18 +14,19 @@ export const HackathonDemoBar: React.FC<DemoBarProps> = ({ currentView: _current
 
   if (dismissed) return null;
 
-  const quickLoginAsAdmin = async () => {
-    await login('admin@campus.edu', 'admin123', 'admin');
-    setCurrentView('admin-dashboard');
+  const quickLoginAsAdmin = () => {
+    if (user?.role === 'admin') {
+      setCurrentView('admin-dashboard');
+    } else {
+      setCurrentView('login');
+    }
   };
 
-  const quickLoginAsStudentDemo = async () => {
-    // If student not registered yet, direct to register or login
-    const res = await login('rahul@example.com', 'Rahul@123', 'student');
-    if (res.success) {
+  const quickLoginAsStudentDemo = () => {
+    if (user?.role === 'student') {
       setCurrentView('student-dashboard');
     } else {
-      setCurrentView('register');
+      setCurrentView('login');
     }
   };
 
@@ -100,7 +101,7 @@ export const HackathonDemoBar: React.FC<DemoBarProps> = ({ currentView: _current
           </div>
           <div className="bg-zinc-900/90 p-2 rounded border border-zinc-800">
             <span className="font-semibold text-teal-400">Step 4-6: AI Triage & ID</span>
-            <p className="text-zinc-400 mt-0.5">Submit "Water leakage near Block A". Gemini classifies Category, Severity, Department & generates unique <strong>CIV-2026-000001</strong>.</p>
+            <p className="text-zinc-400 mt-0.5">Submit "Water leakage near A block". Gemini classifies Category, Severity, Department & generates unique <strong>CIV-2026-000001</strong>.</p>
           </div>
           <div className="bg-zinc-900/90 p-2 rounded border border-zinc-800">
             <span className="font-semibold text-cyan-400">Step 7-9: Admin Workflow</span>

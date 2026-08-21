@@ -23,16 +23,16 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = 'civicresolve_token';
-const USER_KEY = 'civicresolve_user';
+const TOKEN_KEY = 'civicmind_token';
+const USER_KEY = 'civicmind_user';
 
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
-    const saved = localStorage.getItem(USER_KEY);
+    const saved = localStorage.getItem(USER_KEY) || localStorage.getItem('civicresolve_user');
     return saved ? JSON.parse(saved) : null;
   });
   const [token, setToken] = useState<string | null>(() => {
-    return localStorage.getItem(TOKEN_KEY);
+    return localStorage.getItem(TOKEN_KEY) || localStorage.getItem('civicresolve_token');
   });
   const [isLoading, setIsLoading] = useState<boolean>(true);
 

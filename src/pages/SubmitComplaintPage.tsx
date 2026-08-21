@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { Complaint } from '../types';
+import { CAMPUS_BLOCKS, CAMPUS_BLOCK_LIST, CAMPUS_DEPARTMENTS_AND_DEGREES } from '../constants/campus';
 
 interface SubmitComplaintPageProps {
   setCurrentView: (view: string) => void;
@@ -28,15 +29,28 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
   setCurrentView,
   setSelectedComplaintId,
 }) => {
-  const { token } = useAuth();
+  const { token, user } = useAuth();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Water');
-  const [block, setBlock] = useState('Block A');
-  const [floor, setFloor] = useState('Ground Floor');
+  const [department, setDepartment] = useState<string>(user?.department || 'Computer Science & Engineering (CSE)');
+  const [block, setBlock] = useState<string>('A Block');
+  const [floor, setFloor] = useState<string>('Ground Floor');
   const [specificLocation, setSpecificLocation] = useState('Near Boys Washroom');
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  // When block changes, auto-adjust floor options
+  const currentBlockConfig = CAMPUS_BLOCKS[block] || CAMPUS_BLOCKS['A Block'];
+  const availableFloors = currentBlockConfig.floors;
+
+  const handleBlockChange = (newBlock: string) => {
+    setBlock(newBlock);
+    const newConfig = CAMPUS_BLOCKS[newBlock];
+    if (newConfig && !newConfig.floors.includes(floor)) {
+      setFloor(newConfig.floors[0]);
+    }
+  };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitPhase, setSubmitPhase] = useState<string>('');
@@ -116,7 +130,7 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
 
     // Proceed to create complaint
     setIsSubmitting(true);
-    setSubmitPhase('Contacting CivicResolve Gemini AI Engine...');
+    setSubmitPhase('Contacting CivicMind Gemini AI Engine...');
 
     try {
       setTimeout(() => {
@@ -137,6 +151,7 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
           title: title.trim(),
           description: description.trim(),
           category,
+          department,
           location: {
             block,
             floor,
@@ -162,9 +177,9 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
   };
 
   const handleQuickDemoWaterLeakage = () => {
-    setTitle('Water leakage near Block A washroom');
+    setTitle('Water leakage near A block washroom');
     setCategory('Water');
-    setBlock('Block A');
+    handleBlockChange('A Block');
     setFloor('Ground Floor');
     setSpecificLocation('Near Boys Washroom');
     setDescription('There is continuous water leakage from the pipe joint near the washroom entrance and the floor is becoming very slippery. It is posing a hazard for students walking through the corridor.');
@@ -174,7 +189,7 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
   const handleQuickDemoBrokenFan = () => {
     setTitle('Ceiling fan making loud noise and not rotating in Room 204');
     setCategory('Electricity');
-    setBlock('Block B');
+    handleBlockChange('H Block');
     setFloor('2nd Floor');
     setSpecificLocation('Classroom 204, middle row');
     setDescription('The ceiling fan regulator seems faulty and the blades are wobbling dangerously during lectures.');
@@ -257,7 +272,7 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
           />
         </div>
 
-        {/* Category & Location Row */}
+        {/* Category & Department/Degree Row */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-zinc-200 mb-2">
@@ -286,33 +301,49 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
 
           <div>
             <label className="block text-sm font-semibold text-zinc-200 mb-2">
+              Department / Degree Program <span className="text-rose-400">*</span>
+            </label>
+            <select
+              id="complaint-department-select"
+              value={department}
+              onChange={(e) => setDepartment(e.target.value)}
+              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+            >
+              {CAMPUS_DEPARTMENTS_AND_DEGREES.map((dept) => (
+                <option key={dept} value={dept}>
+                  {dept}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Building Block & Floor Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold text-zinc-200 mb-2">
               Building / Block <span className="text-rose-400">*</span>
             </label>
             <select
               id="complaint-block-select"
               value={block}
-              onChange={(e) => setBlock(e.target.value)}
+              onChange={(e) => handleBlockChange(e.target.value)}
               className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
             >
-              <option value="Block A">Block A (Engineering Wing)</option>
-              <option value="Block B">Block B (Science & Tech)</option>
-              <option value="Block C">Block C (Humanities & Admin)</option>
-              <option value="Main Academic Block">Main Academic Block</option>
-              <option value="Hostel 1 (Boys)">Hostel 1 (Boys)</option>
-              <option value="Hostel 2 (Girls)">Hostel 2 (Girls)</option>
-              <option value="Central Library">Central Library</option>
-              <option value="Cafeteria / Food Court">Cafeteria / Food Court</option>
-              <option value="Sports Complex">Sports Complex & Gym</option>
-              <option value="Auditorium">Main Auditorium</option>
+              {CAMPUS_BLOCK_LIST.map((bName) => {
+                const cfg = CAMPUS_BLOCKS[bName];
+                return (
+                  <option key={bName} value={bName}>
+                    {cfg.name} ({cfg.totalFloors} Floors)
+                  </option>
+                );
+              })}
             </select>
           </div>
-        </div>
 
-        {/* Floor & Specific Location */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="block text-sm font-semibold text-zinc-200 mb-2">
-              Floor
+              Floor <span className="text-xs text-zinc-400 font-normal">({availableFloors.length} floors in {block})</span>
             </label>
             <select
               id="complaint-floor-select"
@@ -320,29 +351,28 @@ export const SubmitComplaintPage: React.FC<SubmitComplaintPageProps> = ({
               onChange={(e) => setFloor(e.target.value)}
               className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
             >
-              <option value="Basement">Basement</option>
-              <option value="Ground Floor">Ground Floor</option>
-              <option value="1st Floor">1st Floor</option>
-              <option value="2nd Floor">2nd Floor</option>
-              <option value="3rd Floor">3rd Floor</option>
-              <option value="4th Floor">4th Floor</option>
-              <option value="Terrace / Rooftop">Terrace / Rooftop</option>
+              {availableFloors.map((flr) => (
+                <option key={flr} value={flr}>
+                  {flr}
+                </option>
+              ))}
             </select>
           </div>
+        </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-zinc-200 mb-2">
-              Specific Location Details
-            </label>
-            <input
-              id="complaint-specific-location-input"
-              type="text"
-              value={specificLocation}
-              onChange={(e) => setSpecificLocation(e.target.value)}
-              placeholder="e.g. Near Boys Washroom, Room 204, Water Cooler"
-              className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
-            />
-          </div>
+        {/* Specific Location */}
+        <div>
+          <label className="block text-sm font-semibold text-zinc-200 mb-2">
+            Specific Location Details
+          </label>
+          <input
+            id="complaint-specific-location-input"
+            type="text"
+            value={specificLocation}
+            onChange={(e) => setSpecificLocation(e.target.value)}
+            placeholder="e.g. Near Boys Washroom, Room 204, Water Cooler"
+            className="w-full px-4 py-3 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
+          />
         </div>
 
         {/* Detailed Description */}

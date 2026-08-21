@@ -1,5 +1,5 @@
 {
-  "name": "CivicResolve",
+  "name": "CivicMind",
   "description": "AI Campus Complaint-to-Resolution Platform with intelligent triage, real-time tracking, and automated workflow management.",
   "requestFramePermissions": ["camera"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]

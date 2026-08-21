@@ -39,7 +39,7 @@ export async function analyzeComplaintWithGemini(data: {
   }
 
   try {
-    const prompt = `You are the AI Triage Specialist for "CivicResolve", an AI Campus Complaint-to-Resolution Platform.
+    const prompt = `You are the AI Triage Specialist for "CivicMind", an AI Campus Complaint-to-Resolution Platform.
 Analyze the following student campus complaint and provide an accurate classification, severity assessment, SLA timeframes, and executive summary for administrators.
 
 Complaint Details:
@@ -84,64 +84,84 @@ Rules:
       contents.push(prompt);
     }
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.7-flash',
-      contents,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: {
-          type: Type.OBJECT,
-          properties: {
-            category: {
-              type: Type.STRING,
-              description: 'Primary standardized category',
-            },
-            severity: {
-              type: Type.STRING,
-              enum: ['Low', 'Medium', 'High', 'Critical'],
-              description: 'Severity level of the issue',
-            },
-            priority: {
-              type: Type.STRING,
-              enum: ['P1 — Critical', 'P2 — High', 'P3 — Medium', 'P4 — Low'],
-              description: 'Operational priority',
-            },
-            responsibleDepartment: {
-              type: Type.STRING,
-              description: 'Department responsible for fixing this issue',
-            },
-            estimatedActionTime: {
-              type: Type.STRING,
-              description: 'Expected SLA for first response/triage',
-            },
-            estimatedResolutionTime: {
-              type: Type.STRING,
-              description: 'Expected SLA for total problem resolution',
-            },
-            aiSummary: {
-              type: Type.STRING,
-              description: 'Brief executive summary for admin review',
-            },
-          },
-          required: [
-            'category',
-            'severity',
-            'priority',
-            'responsibleDepartment',
-            'estimatedActionTime',
-            'estimatedResolutionTime',
-            'aiSummary',
-          ],
-        },
-      },
-    });
+    let responseText: string | undefined;
 
-    const text = response.text?.trim();
-    if (!text) {
+    // Try primary model: gemini-2.5-flash
+    try {
+      const response = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents,
+        config: {
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              category: {
+                type: Type.STRING,
+                description: 'Primary standardized category',
+              },
+              severity: {
+                type: Type.STRING,
+                enum: ['Low', 'Medium', 'High', 'Critical'],
+                description: 'Severity level of the issue',
+              },
+              priority: {
+                type: Type.STRING,
+                enum: ['P1 — Critical', 'P2 — High', 'P3 — Medium', 'P4 — Low'],
+                description: 'Operational priority',
+              },
+              responsibleDepartment: {
+                type: Type.STRING,
+                description: 'Department responsible for fixing this issue',
+              },
+              estimatedActionTime: {
+                type: Type.STRING,
+                description: 'Expected SLA for first response/triage',
+              },
+              estimatedResolutionTime: {
+                type: Type.STRING,
+                description: 'Expected SLA for total problem resolution',
+              },
+              aiSummary: {
+                type: Type.STRING,
+                description: 'Brief executive summary for admin review',
+              },
+            },
+            required: [
+              'category',
+              'severity',
+              'priority',
+              'responsibleDepartment',
+              'estimatedActionTime',
+              'estimatedResolutionTime',
+              'aiSummary',
+            ],
+          },
+        },
+      });
+      responseText = response.text?.trim();
+    } catch (primaryErr: any) {
+      console.warn('Gemini 2.5 Flash busy or unavailable, attempting gemini-2.5-flash-lite fallback:', primaryErr?.message || primaryErr);
+      try {
+        const fallbackResponse = await ai.models.generateContent({
+          model: 'gemini-2.5-flash-lite',
+          contents,
+          config: {
+            responseMimeType: 'application/json',
+          },
+        });
+        responseText = fallbackResponse.text?.trim();
+      } catch (secondaryErr: any) {
+        console.warn('Gemini secondary model also unavailable, utilizing smart heuristic triage:', secondaryErr?.message || secondaryErr);
+        return fallbackAnalysis;
+      }
+    }
+
+    if (!responseText) {
       return fallbackAnalysis;
     }
 
-    const parsed = JSON.parse(text);
+    const parsed = JSON.parse(responseText);
     return {
       category: parsed.category || data.category || 'Maintenance',
       severity: (['Low', 'Medium', 'High', 'Critical'].includes(parsed.severity)

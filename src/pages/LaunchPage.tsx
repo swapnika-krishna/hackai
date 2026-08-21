@@ -54,7 +54,7 @@ export const LaunchPage: React.FC<LaunchPageProps> = ({ setCurrentView }) => {
 
           {/* Main Title */}
           <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight text-white mb-4">
-            CivicResolve
+            CivicMind
           </h1>
 
           {/* Subtitle */}
@@ -156,7 +156,7 @@ export const LaunchPage: React.FC<LaunchPageProps> = ({ setCurrentView }) => {
 
       {/* Footer */}
       <footer className="border-t border-zinc-900 py-6 px-4 text-center text-xs text-zinc-500">
-        <p>CivicResolve • Smart Campus & Civic Technology Platform</p>
+        <p>CivicMind • Smart Campus & Civic Technology Platform</p>
       </footer>
     </div>
   );

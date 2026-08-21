@@ -40,7 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
             <div>
               <div className="flex items-center gap-1.5">
                 <span className="text-xl font-bold tracking-tight text-zinc-100 group-hover:text-white transition-colors">
-                  CivicResolve
+                  CivicMind
                 </span>
                 <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                   <Sparkles className="w-2.5 h-2.5 mr-0.5" /> AI Campus

@@ -9,7 +9,7 @@ import { UserRole } from './src/types.js';
 
 dotenv.config();
 
-const JWT_SECRET = process.env.JWT_SECRET || 'civicresolve-campus-secret-key-2026';
+const JWT_SECRET = process.env.JWT_SECRET || 'civicmind-campus-secret-key-2026';
 
 interface AuthRequest extends Request {
   user?: {
@@ -57,7 +57,7 @@ async function startServer() {
   app.get('/api/health', (req, res) => {
     res.json({
       status: 'ok',
-      service: 'CivicResolve API',
+      service: 'CivicMind API',
       timestamp: new Date().toISOString(),
     });
   });
@@ -239,7 +239,7 @@ async function startServer() {
   // Submit Complaint with AI Triage
   app.post('/api/complaints', authenticateToken, async (req: AuthRequest, res) => {
     try {
-      const { title, description, category, location, imageUrl } = req.body;
+      const { title, description, category, department, location, imageUrl } = req.body;
 
       if (!title || !description || !category || !location || !location.block) {
         return res.status(400).json({ error: 'Missing required complaint information' });
@@ -265,7 +265,7 @@ async function startServer() {
         studentIdNumber: user.studentId,
         studentEmail: user.email,
         studentPhone: user.phone,
-        studentDepartment: user.department,
+        studentDepartment: department || user.department,
         studentYear: user.year,
         title,
         description,
@@ -418,7 +418,7 @@ async function startServer() {
   }
 
   app.listen(PORT, '0.0.0.0', () => {
-    console.log(`CivicResolve server listening on http://0.0.0.0:${PORT}`);
+    console.log(`CivicMind server listening on http://0.0.0.0:${PORT}`);
   });
 }
 

@@ -71,11 +71,46 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const [activeTab, setActiveTab] = useState<'tickets' | 'analytics'>('tickets');
 
   useEffect(() => {
-    fetchAdminData();
-  }, [token]);
+    if (user && user.role === 'admin' && token) {
+      fetchAdminData();
+    }
+  }, [token, user]);
+
+  // Strict verification guard
+  if (!user || user.role !== 'admin') {
+    return (
+      <div className="min-h-[75vh] flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-zinc-900/95 border border-rose-500/40 rounded-3xl p-8 text-center shadow-2xl backdrop-blur-xl">
+          <div className="w-16 h-16 bg-rose-500/10 border border-rose-500/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-rose-400">
+            <ShieldAlert className="w-8 h-8" />
+          </div>
+          <h2 className="text-xl font-bold text-white mb-2">Restricted Administrator Portal</h2>
+          <p className="text-xs text-zinc-400 mb-6 leading-relaxed">
+            Strict verification required. Access to the CivicMind campus administration and triage console is restricted exclusively to authorized administrators.
+          </p>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => setCurrentView('login')}
+              className="w-full py-2.5 px-4 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-cyan-500/20"
+            >
+              Sign In with Admin Credentials
+            </button>
+            {user && (
+              <button
+                onClick={() => setCurrentView('student-dashboard')}
+                className="w-full py-2.5 px-4 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-medium text-xs transition-all"
+              >
+                Return to Student Dashboard
+              </button>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const fetchAdminData = async () => {
-    if (!token) return;
+    if (!token || user.role !== 'admin') return;
     setIsLoading(true);
 
     try {

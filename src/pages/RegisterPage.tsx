@@ -13,6 +13,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { CAMPUS_DEPARTMENTS_AND_DEGREES } from '../constants/campus';
 
 interface RegisterPageProps {
   setCurrentView: (view: string) => void;
@@ -26,7 +27,7 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setCurrentView }) =>
     studentId: '',
     email: '',
     phone: '',
-    department: 'Computer Science (CSE)',
+    department: 'Computer Science & Engineering (CSE)',
     year: '3',
     password: '',
     confirmPassword: '',
@@ -233,15 +234,11 @@ export const RegisterPage: React.FC<RegisterPageProps> = ({ setCurrentView }) =>
                     onChange={handleChange}
                     className="w-full pl-10 pr-3.5 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500"
                   >
-                    <option value="Computer Science (CSE)">Computer Science (CSE)</option>
-                    <option value="Information Technology (IT)">Information Technology (IT)</option>
-                    <option value="Electronics & Comm (ECE)">Electronics & Comm (ECE)</option>
-                    <option value="Mechanical Engineering">Mechanical Engineering</option>
-                    <option value="Civil Engineering">Civil Engineering</option>
-                    <option value="Biotechnology">Biotechnology</option>
-                    <option value="Electrical Engineering (EEE)">Electrical Engineering (EEE)</option>
-                    <option value="Management & Commerce">Management & Commerce</option>
-                    <option value="Sciences & Humanities">Sciences & Humanities</option>
+                    {CAMPUS_DEPARTMENTS_AND_DEGREES.map((dept) => (
+                      <option key={dept} value={dept}>
+                        {dept}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>

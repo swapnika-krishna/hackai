@@ -22,7 +22,7 @@ const MainApp: React.FC = () => {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-400">
         <div className="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin mb-4" />
-        <p className="text-sm font-medium">Initializing CivicResolve Secure Ledger...</p>
+        <p className="text-sm font-medium">Initializing CivicMind Secure Ledger...</p>
       </div>
     );
   }
@@ -36,6 +36,9 @@ const MainApp: React.FC = () => {
       case 'register':
         return <RegisterPage setCurrentView={setCurrentView} />;
       case 'student-dashboard':
+        if (!isAuthenticated) {
+          return <LoginPage setCurrentView={setCurrentView} defaultRole="student" accessDeniedMessage="Please sign in to access your Student Dashboard." />;
+        }
         return (
           <StudentDashboard
             setCurrentView={setCurrentView}
@@ -43,6 +46,9 @@ const MainApp: React.FC = () => {
           />
         );
       case 'submit-complaint':
+        if (!isAuthenticated) {
+          return <LoginPage setCurrentView={setCurrentView} defaultRole="student" accessDeniedMessage="Please sign in to submit a campus complaint." />;
+        }
         return (
           <SubmitComplaintPage
             setCurrentView={setCurrentView}
@@ -58,6 +64,9 @@ const MainApp: React.FC = () => {
           />
         );
       case 'my-complaints':
+        if (!isAuthenticated) {
+          return <LoginPage setCurrentView={setCurrentView} defaultRole="student" accessDeniedMessage="Please sign in to view your complaint records." />;
+        }
         return (
           <MyComplaintsPage
             setCurrentView={setCurrentView}
@@ -65,9 +74,22 @@ const MainApp: React.FC = () => {
           />
         );
       case 'profile':
+        if (!isAuthenticated) {
+          return <LoginPage setCurrentView={setCurrentView} defaultRole="student" accessDeniedMessage="Please sign in to access your profile." />;
+        }
         return <ProfilePage setCurrentView={setCurrentView} />;
       case 'admin-dashboard':
       case 'admin-complaints':
+        // Strict verification: User must be authenticated AND have the 'admin' role
+        if (!isAuthenticated || user?.role !== 'admin') {
+          return (
+            <LoginPage
+              setCurrentView={setCurrentView}
+              defaultRole="admin"
+              accessDeniedMessage="Strict Admin Authorization Required. You must sign in with verified campus administrator credentials to access the Admin Portal."
+            />
+          );
+        }
         return (
           <AdminDashboard
             setCurrentView={setCurrentView}
@@ -106,7 +128,7 @@ const MainApp: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div className="flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-            <span className="font-semibold text-zinc-400">CivicResolve Campus Node</span>
+            <span className="font-semibold text-zinc-400">CivicMind Campus Node</span>
             <span className="text-zinc-600">|</span>
             <span className="text-emerald-400 font-mono text-[11px]">Cloud Firestore Persistent DB</span>
             <span className="text-zinc-600">|</span>

@@ -19,6 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { StudentStats } from '../types';
+import { CAMPUS_DEPARTMENTS_AND_DEGREES } from '../constants/campus';
 
 interface ProfilePageProps {
   setCurrentView: (view: string) => void;
@@ -441,20 +442,17 @@ export const ProfilePage: React.FC<ProfilePageProps> = ({ setCurrentView }) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-medium text-zinc-300 mb-1.5">Department</label>
+                <label className="block text-xs font-medium text-zinc-300 mb-1.5">Department / Degree</label>
                 <select
                   value={editForm.department}
                   onChange={(e) => setEditForm({ ...editForm, department: e.target.value })}
                   className="w-full px-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
                 >
-                  <option value="Computer Science (CSE)">Computer Science (CSE)</option>
-                  <option value="Information Technology (IT)">Information Technology (IT)</option>
-                  <option value="Electronics & Comm (ECE)">Electronics & Comm (ECE)</option>
-                  <option value="Mechanical Engineering">Mechanical Engineering</option>
-                  <option value="Civil Engineering">Civil Engineering</option>
-                  <option value="Biotechnology">Biotechnology</option>
-                  <option value="Electrical Engineering (EEE)">Electrical Engineering (EEE)</option>
-                  <option value="Campus Administration">Campus Administration</option>
+                  {CAMPUS_DEPARTMENTS_AND_DEGREES.map((dept) => (
+                    <option key={dept} value={dept}>
+                      {dept}
+                    </option>
+                  ))}
                 </select>
               </div>
 
