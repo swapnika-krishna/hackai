@@ -268,13 +268,17 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
       {/* Top Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-zinc-800/80 mb-8">
         <div>
-          <div className="flex items-center gap-2 mb-1">
+          <div className="flex items-center gap-2 mb-1 flex-wrap">
             <span className="text-xs font-semibold text-cyan-400 uppercase tracking-wider">
               Administration Console
             </span>
             <span className="text-zinc-600">•</span>
             <span className="text-xs text-zinc-400">
               Campus Operations & SLA Control
+            </span>
+            <span className="text-zinc-600">•</span>
+            <span className="text-xs text-emerald-400 font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-800/40">
+              Admin: {user?.name || 'krishna'} ({user?.email || 'jakkaswapnika@gmail.com'})
             </span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">

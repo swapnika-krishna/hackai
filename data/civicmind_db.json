@@ -1,190 +1,99 @@
 {
   "users": [
     {
-      "id": "usr-1787297041149-gixfj",
-      "year": "3",
-      "role": "student",
-      "name": "Swapnika Jakka",
-      "passwordHash": "$2b$10$ij1ITW4aHczHELWbb7/K1.KuFpWNKm75v0FTTft5Qd0rEk9pIEACC",
+      "studentId": "241FA04509",
+      "department": "Campus Administration",
+      "createdAt": "2026-08-21T07:24:01.149Z",
       "email": "jakkaswapnika@gmail.com",
+      "phone": "6281181993",
+      "role": "admin",
+      "year": "3",
+      "name": "krishna",
       "notificationPreferences": {
         "statusChangeAlerts": true,
         "smsAlerts": true,
         "emailAlerts": true
       },
-      "phone": "6281181993",
-      "createdAt": "2026-08-21T07:24:01.149Z",
-      "department": "Computer Science (CSE)",
-      "studentId": "241FA04509"
+      "id": "usr-1787297041149-gixfj",
+      "passwordHash": "$2b$10$kp1UQEXHKy0BMLrfOZgr5uB23q4NjBgEdhnkwyaDch7Wd7B.JeXeq"
     },
     {
-      "role": "admin",
-      "id": "usr-admin-01",
-      "name": "Campus Administrator",
-      "department": "Campus Administration",
-      "email": "admin@campus.edu",
-      "passwordHash": "$2b$10$zxQM3f8NGrOcEZqMqQy4jeTOAYEjUEiS10gUV/MimlmYPV.3iKw2u",
+      "role": "student",
+      "passwordHash": "$2b$10$Opvegqh3QJUQJbAZRkD4jO6HUto1eqEeOy2xB/INiKZEc3Q/RZAgO",
+      "id": "usr-1787368731357-anpcx",
       "phone": "9876543210",
-      "createdAt": "2026-08-21T07:22:15.047Z",
+      "email": "rahul@example.com",
+      "studentId": "23CSE001",
+      "createdAt": "2026-08-22T03:18:51.357Z",
+      "year": "3",
+      "name": "Rahul Sharma",
+      "department": "Computer Science (CSE)",
       "notificationPreferences": {
-        "statusChangeAlerts": true,
+        "smsAlerts": true,
         "emailAlerts": true,
-        "smsAlerts": true
+        "statusChangeAlerts": true
       }
     }
   ],
   "complaints": [
     {
-      "userId": "usr-1787297041149-gixfj",
-      "studentName": "Swapnika Jakka",
-      "studentIdNumber": "241FA04509",
-      "studentEmail": "jakkaswapnika@gmail.com",
-      "studentPhone": "6281181993",
       "studentDepartment": "Computer Science (CSE)",
-      "studentYear": "3",
-      "title": "smartboard is not working at a block 3rd floor 303",
-      "description": "resolve this",
-      "category": "Classroom",
-      "location": {
-        "block": "Block A",
-        "floor": "3rd Floor",
-        "specificLocation": "3rd floor ,303"
-      },
       "severity": "Medium",
-      "priority": "P3 — Normal",
-      "department": "Maintenance Department",
-      "estimatedActionTime": "Expected action within 4 hours",
-      "estimatedResolutionTime": "Expected resolution within 24 hours",
-      "aiSummary": "smartboard is not working at a block 3rd floor 303 reported at Block A, 3rd Floor (3rd floor ,303). Issue analyzed for Hostel Administration attention.",
-      "aiRawAnalysis": {
-        "category": "Classroom",
-        "severity": "Medium",
-        "priority": "P3 — Medium",
-        "responsibleDepartment": "Hostel Administration",
-        "estimatedActionTime": "Expected action within 4 hours",
-        "estimatedResolutionTime": "Expected resolution within 24 hours",
-        "aiSummary": "smartboard is not working at a block 3rd floor 303 reported at Block A, 3rd Floor (3rd floor ,303). Issue analyzed for Hostel Administration attention."
-      },
-      "status": "Under Review",
-      "id": "cmp-1787301783328-cxosm",
-      "complaintId": "CIV-2026-000002",
-      "createdAt": "2026-08-21T08:43:03.328Z",
-      "updatedAt": "2026-08-21T08:46:19.024Z",
-      "history": [
-        {
-          "id": "hst-1787301783328-1",
-          "complaintId": "CIV-2026-000002",
-          "newStatus": "Submitted",
-          "action": "Complaint Submitted",
-          "changedBy": "Student (Swapnika Jakka)",
-          "changedByRole": "student",
-          "remark": "Complaint registered in campus portal.",
-          "timestamp": "2026-08-21T08:43:03.328Z"
-        },
-        {
-          "id": "hst-1787301783328-2",
-          "complaintId": "CIV-2026-000002",
-          "newStatus": "Submitted",
-          "action": "AI Triage & Analysis Completed",
-          "changedBy": "CivicMind AI Engine",
-          "changedByRole": "system",
-          "remark": "Assigned Category: Classroom | Severity: Medium | Priority: P3 — Medium | Department: Hostel Administration",
-          "timestamp": "2026-08-21T08:43:03.328Z"
-        },
-        {
-          "id": "hst-1787301979024-w2u",
-          "complaintId": "CIV-2026-000002",
-          "previousStatus": "Submitted",
-          "newStatus": "Under Review",
-          "action": "Status changed to Under Review",
-          "changedBy": "Admin (Campus Administrator)",
-          "changedByRole": "admin",
-          "remark": "Updated details (Dept: Maintenance Department, Priority: P3 — Normal)",
-          "timestamp": "2026-08-21T08:46:19.024Z"
-        }
-      ]
-    },
-    {
-      "userId": "usr-1787297041149-gixfj",
-      "studentName": "Swapnika Jakka",
-      "studentIdNumber": "241FA04509",
-      "studentEmail": "jakkaswapnika@gmail.com",
-      "studentPhone": "6281181993",
-      "studentDepartment": "Computer Science (CSE)",
       "studentYear": "3",
-      "title": "Water leakage problem at A block 4th floor near 413",
-      "description": "solve this problem",
-      "category": "Water",
-      "location": {
-        "block": "Block A",
-        "floor": "4th Floor",
-        "specificLocation": "Near  413"
-      },
-      "severity": "High",
-      "priority": "P2 — High",
-      "department": "Maintenance Department",
-      "estimatedActionTime": "Expected action within 2 hours",
-      "estimatedResolutionTime": "Expected resolution within 6 hours",
-      "aiSummary": "An active water leakage has been reported on the 4th floor of Block A near room 413. Immediate plumbing maintenance is required to prevent water damage, slipping hazards, and structural deterioration.",
-      "aiRawAnalysis": {
-        "category": "Water",
-        "severity": "High",
-        "priority": "P2 — High",
-        "responsibleDepartment": "Maintenance Department",
-        "estimatedActionTime": "Expected action within 2 hours",
-        "estimatedResolutionTime": "Expected resolution within 6 hours",
-        "aiSummary": "An active water leakage has been reported on the 4th floor of Block A near room 413. Immediate plumbing maintenance is required to prevent water damage, slipping hazards, and structural deterioration."
-      },
-      "status": "Resolved",
-      "id": "cmp-1787297182904-d49aq",
-      "complaintId": "CIV-2026-000001",
-      "createdAt": "2026-08-21T07:26:22.904Z",
-      "updatedAt": "2026-08-21T07:28:19.992Z",
       "history": [
         {
-          "id": "hst-1787297182904-1",
-          "complaintId": "CIV-2026-000001",
-          "newStatus": "Submitted",
-          "action": "Complaint Submitted",
-          "changedBy": "Student (Swapnika Jakka)",
-          "changedByRole": "student",
           "remark": "Complaint registered in campus portal.",
-          "timestamp": "2026-08-21T07:26:22.904Z"
+          "changedByRole": "student",
+          "timestamp": "2026-08-22T03:20:08.981Z",
+          "complaintId": "CIV-2026-000003",
+          "changedBy": "Student (Rahul Sharma)",
+          "id": "hst-1787368808981-1",
+          "newStatus": "Submitted",
+          "action": "Complaint Submitted"
         },
         {
-          "id": "hst-1787297182904-2",
-          "complaintId": "CIV-2026-000001",
-          "newStatus": "Submitted",
+          "timestamp": "2026-08-22T03:20:08.981Z",
           "action": "AI Triage & Analysis Completed",
-          "changedBy": "CivicMind AI Engine",
+          "id": "hst-1787368808981-2",
+          "complaintId": "CIV-2026-000003",
           "changedByRole": "system",
-          "remark": "Assigned Category: Water | Severity: High | Priority: P2 — High | Department: Maintenance Department",
-          "timestamp": "2026-08-21T07:26:22.904Z"
-        },
-        {
-          "id": "hst-1787297282011-fmr",
-          "complaintId": "CIV-2026-000001",
-          "previousStatus": "Submitted",
-          "newStatus": "Submitted",
-          "action": "Admin Updated Complaint Details",
-          "changedBy": "Admin (Campus Administrator)",
-          "changedByRole": "admin",
-          "remark": "Updated details (Dept: Maintenance Department, Priority: P2 — High)",
-          "timestamp": "2026-08-21T07:28:02.011Z"
-        },
-        {
-          "id": "hst-1787297299992-nhg",
-          "complaintId": "CIV-2026-000001",
-          "previousStatus": "Submitted",
-          "newStatus": "Resolved",
-          "action": "Status changed to Resolved",
-          "changedBy": "Admin (Campus Administrator)",
-          "changedByRole": "admin",
-          "remark": "Updated details (Dept: Maintenance Department, Priority: P2 — High)",
-          "timestamp": "2026-08-21T07:28:19.992Z"
+          "changedBy": "CivicMind AI Engine",
+          "remark": "Assigned Category: Water | Severity: Medium | Priority: P3 — Medium | Department: Maintenance Department (Plumbing Wing)",
+          "newStatus": "Submitted"
         }
       ],
-      "resolvedAt": "2026-08-21T07:28:19.992Z"
+      "department": "Maintenance Department (Plumbing Wing)",
+      "id": "cmp-1787368808981-b347s",
+      "studentIdNumber": "23CSE001",
+      "title": "water leakage",
+      "aiSummary": "water leakage reported at A Block, Ground Floor (Near Boys Washroom). Issue analyzed for Maintenance Department (Plumbing Wing) attention.",
+      "updatedAt": "2026-08-22T03:20:08.981Z",
+      "studentPhone": "9876543210",
+      "estimatedResolutionTime": "Expected resolution within 24 hours",
+      "priority": "P3 — Medium",
+      "complaintId": "CIV-2026-000003",
+      "estimatedActionTime": "Expected action within 2 hours",
+      "studentName": "Rahul Sharma",
+      "studentEmail": "rahul@example.com",
+      "location": {
+        "floor": "Ground Floor",
+        "specificLocation": "Near Boys Washroom",
+        "block": "A Block"
+      },
+      "category": "Water",
+      "status": "Submitted",
+      "aiRawAnalysis": {
+        "estimatedResolutionTime": "Expected resolution within 24 hours",
+        "category": "Water",
+        "priority": "P3 — Medium",
+        "aiSummary": "water leakage reported at A Block, Ground Floor (Near Boys Washroom). Issue analyzed for Maintenance Department (Plumbing Wing) attention.",
+        "estimatedActionTime": "Expected action within 2 hours",
+        "responsibleDepartment": "Maintenance Department (Plumbing Wing)",
+        "severity": "Medium"
+      },
+      "createdAt": "2026-08-22T03:20:08.981Z",
+      "description": "water leakage",
+      "userId": "usr-1787368731357-anpcx"
     }
   ],
   "complaintHistory": [
@@ -263,7 +172,7 @@
     }
   ],
   "counters": {
-    "complaintSeq": 2,
-    "year": 2026
+    "year": 2026,
+    "complaintSeq": 3
   }
 }

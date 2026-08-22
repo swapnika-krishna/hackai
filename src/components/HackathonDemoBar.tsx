@@ -105,7 +105,7 @@ export const HackathonDemoBar: React.FC<DemoBarProps> = ({ currentView: _current
           </div>
           <div className="bg-zinc-900/90 p-2 rounded border border-zinc-800">
             <span className="font-semibold text-cyan-400">Step 7-9: Admin Workflow</span>
-            <p className="text-zinc-400 mt-0.5">Log in as Admin (<code>admin@campus.edu</code>). View real complaint in dashboard. Advance status: Submitted → In Progress.</p>
+            <p className="text-zinc-400 mt-0.5">Log in as Admin (Name: <code>krishna</code>, Email: <code>jakkaswapnika@gmail.com</code>). View real complaint in dashboard. Advance status: Submitted → In Progress.</p>
           </div>
           <div className="bg-zinc-900/90 p-2 rounded border border-zinc-800">
             <span className="font-semibold text-blue-400">Step 10-12: Live Resolution</span>

@@ -6,7 +6,7 @@ interface AuthContextType {
   token: string | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (emailOrId: string, password: string, selectedRole?: 'student' | 'admin') => Promise<{ success: boolean; error?: string }>;
+  login: (emailOrId: string, password: string, selectedRole?: 'student' | 'admin', name?: string) => Promise<{ success: boolean; error?: string }>;
   register: (userData: {
     name: string;
     studentId: string;
@@ -71,12 +71,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     verifyUser();
   }, []);
 
-  const login = async (emailOrId: string, password: string, selectedRole?: 'student' | 'admin') => {
+  const login = async (emailOrId: string, password: string, selectedRole?: 'student' | 'admin', name?: string) => {
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emailOrId, password, selectedRole }),
+        body: JSON.stringify({ emailOrId, password, selectedRole, name }),
       });
 
       const data = await res.json();

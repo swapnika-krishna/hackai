@@ -118,10 +118,30 @@ async function startServer() {
   // Login (Student or Admin)
   app.post('/api/auth/login', (req, res) => {
     try {
-      const { emailOrId, password, selectedRole } = req.body;
+      const { emailOrId, password, selectedRole, name } = req.body;
 
       if (!emailOrId || !password) {
         return res.status(400).json({ error: 'Email/ID and password are required' });
+      }
+
+      // Strict Admin Access Control
+      if (selectedRole === 'admin') {
+        const normalizedEmail = emailOrId.toLowerCase().trim();
+        const normalizedName = name ? name.toLowerCase().trim() : '';
+
+        // Enforce exact admin email: jakkaswapnika@gmail.com
+        if (normalizedEmail !== 'jakkaswapnika@gmail.com') {
+          return res.status(403).json({
+            error: 'Access Denied: Admin portal access is strictly restricted to authorized administrator email (jakkaswapnika@gmail.com).',
+          });
+        }
+
+        // Enforce exact admin name: krishna
+        if (!normalizedName || normalizedName !== 'krishna') {
+          return res.status(403).json({
+            error: 'Access Denied: Admin Name must be entered as "krishna" to authorize admin portal access.',
+          });
+        }
       }
 
       // Find by email or student ID
@@ -138,6 +158,13 @@ async function startServer() {
       if (selectedRole && user.role !== selectedRole) {
         return res.status(403).json({
           error: `This account does not have ${selectedRole} privileges. Please switch to the ${user.role} login option.`,
+        });
+      }
+
+      // If user is admin, enforce that their name in record is krishna
+      if (user.role === 'admin' && user.email.toLowerCase().trim() !== 'jakkaswapnika@gmail.com') {
+        return res.status(403).json({
+          error: 'Access Denied: Only administrator Krishna (jakkaswapnika@gmail.com) is authorized.',
         });
       }
 
@@ -214,6 +241,25 @@ async function startServer() {
       res.json({ message: 'Password updated successfully' });
     } catch (err: any) {
       res.status(500).json({ error: err.message || 'Password update failed' });
+    }
+  });
+
+  // Reset Password (Forgot Password flow)
+  app.post('/api/auth/reset-password', (req, res) => {
+    try {
+      const { emailOrId, newPassword } = req.body;
+      if (!emailOrId || !newPassword) {
+        return res.status(400).json({ error: 'Account identifier and new password are required' });
+      }
+
+      const success = db.resetUserPassword(emailOrId, newPassword);
+      if (!success) {
+        return res.status(404).json({ error: 'User account not found' });
+      }
+
+      res.json({ message: 'Password reset successfully. You can now login with your new password.' });
+    } catch (err: any) {
+      res.status(500).json({ error: err.message || 'Password reset failed' });
     }
   });
 

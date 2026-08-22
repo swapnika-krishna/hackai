@@ -174,20 +174,6 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
                   </>
                 )}
 
-                {/* Top Theme & Campus Background Manager Trigger */}
-                <button
-                  id="nav-btn-theme-switcher"
-                  onClick={() => setIsThemeModalOpen(true)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-700/80 text-zinc-300 hover:text-emerald-300 transition-all ml-1 shadow-sm"
-                  title="Customize Theme & Campus Blurred Background Photos"
-                >
-                  <Palette className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="hidden sm:inline">Theme & BG</span>
-                  {settings.isBgEnabled && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                  )}
-                </button>
-
                 {/* User badge & Logout */}
                 <div className="flex items-center gap-2 pl-2 sm:pl-3 border-l border-zinc-800">
                   <div className="hidden sm:flex flex-col text-right">
@@ -219,22 +205,24 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
                     <LogOut className="w-4 h-4" />
                   </button>
                 </div>
+
+                {/* Top Right Corner Theme & Campus Background Manager Trigger */}
+                <button
+                  id="nav-btn-theme-top-right"
+                  onClick={() => setIsThemeModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-zinc-900/90 hover:bg-zinc-800 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 transition-all shadow-sm hover:shadow-emerald-500/10 ml-1"
+                  title="Theme & Campus Background Settings"
+                >
+                  <Palette className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="inline">Theme</span>
+                  {settings.isBgEnabled && (
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  )}
+                </button>
               </nav>
             ) : (
               /* Logged Out Navigation */
               <div className="flex items-center gap-2 sm:gap-3">
-                
-                {/* Theme & Background button for guests too */}
-                <button
-                  id="nav-btn-guest-theme"
-                  onClick={() => setIsThemeModalOpen(true)}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-300 hover:text-emerald-300 transition-colors shadow-sm"
-                  title="Customize Theme & Campus Background"
-                >
-                  <Palette className="w-3.5 h-3.5 text-emerald-400" />
-                  <span className="hidden sm:inline">Theme & BG</span>
-                </button>
-
                 <button
                   id="nav-btn-guest-track"
                   onClick={() => setCurrentView('track-complaint')}
@@ -250,6 +238,20 @@ export const Navbar: React.FC<NavbarProps> = ({ currentView, setCurrentView }) =
                   className="px-4 py-2 rounded-lg text-sm font-medium bg-emerald-500 text-zinc-950 hover:bg-emerald-400 transition-all font-semibold shadow-md shadow-emerald-500/20"
                 >
                   Campus Login
+                </button>
+
+                {/* Top Right Corner Theme & Background button for guests */}
+                <button
+                  id="nav-btn-guest-theme-top-right"
+                  onClick={() => setIsThemeModalOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold bg-zinc-900/90 hover:bg-zinc-800 border border-emerald-500/30 text-emerald-300 hover:text-emerald-200 transition-colors shadow-sm hover:shadow-emerald-500/10"
+                  title="Theme & Campus Background Settings"
+                >
+                  <Palette className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span className="inline">Theme</span>
+                  {settings.isBgEnabled && (
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  )}
                 </button>
               </div>
             )}

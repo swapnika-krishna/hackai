@@ -27,6 +27,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 }) => {
   const { login } = useAuth();
   const [selectedRole, setSelectedRole] = useState<UserRole>(defaultRole);
+  const [adminName, setAdminName] = useState('');
   const [emailOrId, setEmailOrId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(accessDeniedMessage || null);
@@ -36,8 +37,43 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     e.preventDefault();
     setError(null);
 
+    if (selectedRole === 'admin') {
+      if (!adminName.trim()) {
+        setError('Admin Name is required. Please enter "krishna".');
+        return;
+      }
+      if (adminName.trim().toLowerCase() !== 'krishna') {
+        setError('Access Denied: Admin Name must be entered as "krishna".');
+        return;
+      }
+      if (!emailOrId.trim()) {
+        setError('Admin Email is required. Please enter "jakkaswapnika@gmail.com".');
+        return;
+      }
+      if (emailOrId.trim().toLowerCase() !== 'jakkaswapnika@gmail.com') {
+        setError('Access Denied: Admin Email must be entered as "jakkaswapnika@gmail.com".');
+        return;
+      }
+      if (!password) {
+        setError('Please enter the Admin security password.');
+        return;
+      }
+
+      setIsSubmitting(true);
+      const result = await login(emailOrId.trim(), password, 'admin', adminName.trim());
+      setIsSubmitting(false);
+
+      if (result.success) {
+        setCurrentView('admin-dashboard');
+      } else {
+        setError(result.error || 'Admin verification failed. Please verify credentials.');
+      }
+      return;
+    }
+
+    // Student Login
     if (!emailOrId.trim()) {
-      setError(selectedRole === 'student' ? 'Please enter your Student Email or Roll Number' : 'Please enter your Admin Email or ID');
+      setError('Please enter your Student Email or Roll Number');
       return;
     }
 
@@ -47,15 +83,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({
     }
 
     setIsSubmitting(true);
-    const result = await login(emailOrId.trim(), password, selectedRole);
+    const result = await login(emailOrId.trim(), password, 'student');
     setIsSubmitting(false);
 
     if (result.success) {
-      if (selectedRole === 'admin') {
-        setCurrentView('admin-dashboard');
-      } else {
-        setCurrentView('student-dashboard');
-      }
+      setCurrentView('student-dashboard');
     } else {
       setError(result.error || 'Authentication failed. Please check your credentials.');
     }
@@ -63,7 +95,8 @@ export const LoginPage: React.FC<LoginPageProps> = ({
 
   const handleQuickFillAdmin = () => {
     setSelectedRole('admin');
-    setEmailOrId('admin@campus.edu');
+    setAdminName('krishna');
+    setEmailOrId('jakkaswapnika@gmail.com');
     setPassword('admin123');
     setError(null);
   };
@@ -151,28 +184,71 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             </div>
           )}
 
+          {/* Admin Security Verification Banner */}
+          {selectedRole === 'admin' && (
+            <div className="mb-4 p-3 rounded-xl bg-cyan-950/30 border border-cyan-800/40 text-cyan-300 text-xs">
+              <div className="flex items-center gap-1.5 font-semibold text-cyan-200 mb-1">
+                <ShieldAlert className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Strict Admin Authorization Required</span>
+              </div>
+              <p className="text-[11px] text-cyan-400/80 leading-relaxed">
+                Only verified administrator <strong>krishna</strong> with email <strong>jakkaswapnika@gmail.com</strong> is authorized to access the Campus Administration Portal.
+              </p>
+            </div>
+          )}
+
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             
+            {/* Admin Name Input (Rendered only when role is admin) */}
+            {selectedRole === 'admin' && (
+              <div>
+                <label 
+                  htmlFor="login-admin-name-input"
+                  className="block text-xs font-medium text-zinc-300 mb-1.5"
+                >
+                  Admin Name <span className="text-rose-400">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
+                    <UserCheck className="w-4 h-4 text-cyan-400" />
+                  </div>
+                  <input
+                    id="login-admin-name-input"
+                    type="text"
+                    value={adminName}
+                    onChange={(e) => setAdminName(e.target.value)}
+                    placeholder="krishna"
+                    className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500 transition-colors"
+                    required
+                  />
+                </div>
+              </div>
+            )}
+
             {/* Email / ID Input */}
             <div>
               <label 
                 htmlFor="login-email-input"
                 className="block text-xs font-medium text-zinc-300 mb-1.5"
               >
-                {selectedRole === 'student' ? 'Student Email / Roll Number' : 'Admin Email / ID'}
+                {selectedRole === 'student' ? 'Student Email / Roll Number' : 'Admin Email'} <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
-                  <Mail className="w-4 h-4" />
+                  <Mail className={`w-4 h-4 ${selectedRole === 'admin' ? 'text-cyan-400' : 'text-emerald-400'}`} />
                 </div>
                 <input
                   id="login-email-input"
-                  type="text"
+                  type={selectedRole === 'admin' ? 'email' : 'text'}
                   value={emailOrId}
                   onChange={(e) => setEmailOrId(e.target.value)}
-                  placeholder={selectedRole === 'student' ? 'e.g. rahul@example.com or 23CSE001' : 'admin@campus.edu'}
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-colors"
+                  placeholder={selectedRole === 'student' ? 'e.g. rahul@example.com or 23CSE001' : 'jakkaswapnika@gmail.com'}
+                  className={`w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 transition-colors ${
+                    selectedRole === 'admin' 
+                      ? 'focus:ring-cyan-500/50 focus:border-cyan-500' 
+                      : 'focus:ring-emerald-500/50 focus:border-emerald-500'
+                  }`}
                   required
                 />
               </div>
@@ -184,11 +260,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                 htmlFor="login-password-input"
                 className="block text-xs font-medium text-zinc-300 mb-1.5"
               >
-                Password
+                Password <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-zinc-500">
-                  <Lock className="w-4 h-4" />
+                  <Lock className={`w-4 h-4 ${selectedRole === 'admin' ? 'text-cyan-400' : 'text-emerald-400'}`} />
                 </div>
                 <input
                   id="login-password-input"
@@ -196,7 +272,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 focus:border-emerald-500 transition-colors"
+                  className={`w-full pl-10 pr-4 py-2.5 bg-zinc-950 border border-zinc-800 rounded-xl text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:ring-2 transition-colors ${
+                    selectedRole === 'admin' 
+                      ? 'focus:ring-cyan-500/50 focus:border-cyan-500' 
+                      : 'focus:ring-emerald-500/50 focus:border-emerald-500'
+                  }`}
                   required
                 />
               </div>
@@ -216,11 +296,11 @@ export const LoginPage: React.FC<LoginPageProps> = ({
               {isSubmitting ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-zinc-950 border-t-transparent rounded-full animate-spin"></span>
-                  Authenticating...
+                  Verifying Credentials...
                 </span>
               ) : (
                 <>
-                  <span>Login as {selectedRole === 'student' ? 'Student' : 'Admin'}</span>
+                  <span>Login as {selectedRole === 'student' ? 'Student' : 'Administrator (krishna)'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
@@ -250,13 +330,14 @@ export const LoginPage: React.FC<LoginPageProps> = ({
             <p className="text-[11px] text-zinc-500 font-medium mb-1.5">
               Quick Hackathon Evaluation Fill:
             </p>
-            <div className="flex items-center justify-center gap-2">
+            <div className="flex flex-wrap items-center justify-center gap-2">
               <button
                 type="button"
                 onClick={handleQuickFillAdmin}
-                className="text-[11px] px-2.5 py-1 rounded bg-cyan-950/40 text-cyan-400 border border-cyan-800/40 hover:bg-cyan-900/40 transition-colors"
+                className="text-[11px] px-2.5 py-1 rounded bg-cyan-950/40 text-cyan-300 border border-cyan-800/40 hover:bg-cyan-900/40 transition-colors"
+                title="Fill krishna / jakkaswapnika@gmail.com"
               >
-                Fill Admin (admin@campus.edu)
+                Fill Admin (krishna / jakkaswapnika@gmail.com)
               </button>
               <button
                 type="button"
